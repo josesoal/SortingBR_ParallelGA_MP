@@ -1,0 +1,157 @@
+
+Introduction
+============
+
+This directory contains the source code of the implementation of the following
+algorithm:
+- Parallel Genetic Algorithm for the SUPBR problem (Parallel-GA).
+  (version with multiple populations)
+
+The authors of the implementation are:
+	Jose Luis Soncco-Alvarez (jose.soncco.alvarez@gmail.com)
+	and
+	Mauricio Ayala-Rincon (ayala@unb.br)
+
+Both authors from the Group of Theory of Computation at the University of
+Brasilia.
+
+(SUPBR - "Sorting Unsigned Permutations by Reversals")
+
+Setup
+=====
+
+The source code was tested under MAC OSX and UBUNTU LINUX platforms. As first
+step we need to execute the makefile:
+$ make clean all -f makefile.pga
+
+The previous commands will generate the following executable: 
+"parallel_ga". 
+
+Input Data
+==========
+
+Initially, the input data was intended to be two permutations that correspond
+to the gene order of two organisms with the same gene set. We assume that the
+genes of the second organism are represented as increasing naturals, leading
+to a identity permutation. Then, we JUST NEED as input the first permutation,
+which maintains the same natural number representation for each gene but in
+the order of the first organism. 
+
+For instance, if the input data is the permutation {2,4,3,1}, it will have the 
+following format:
+4
+2
+4
+3
+1
+
+The first line is the length of the permutation, that is, the number of genes
+of an organism. The remaining lines are the gene order of an organism.
+
+The SUPBR problem consists in finding the minimum number of reversals for
+transforming an unsigned permutation into the identity permutation.
+
+Usage
+=====
+
+The program has the following parameter options:
+
+-s : seed for srand() [default: time(NULL)]
+-g : number of generations, for each GA in a slave
+     [default: -1 = the input length is the number of generations 
+      for each slave)]
+-t : total number of generations, distributed equally among the slaves
+     [default: -1 = the input length is the number of generations 
+      for each slave)]
+-e : number of evaluations to stop program 
+     [default: -1 = this feature is not used]
+-r : number of reversals to stop program 
+     [default: -1 = this feature is not used]
+-m : print mode [default: final_result]
+        options:
+        -m final_result : print number of reversals, number of evaluations of
+                          fitness function, and number of used generations
+        -m best_by_gen  : print the best solution by generation
+        -m eval_by_gen  : print the number of evaluations of fitness function
+                          by generation
+-p : population size for each GA in a slave
+     [default: -1 = the population size is nlogn, n is input length]
+
+Note: Do not use the parameters "-g" or "-t" at the same time.
+
+Note: The input permutation must be in a file labeled as "i", in this
+      directory is included the file "i" with a permutation of length 50. 	
+
+Examples of use of "parallel_ga":
+
+(1) The following command executes the parallel_ga by using 4 processes (-np)
+    one master and 3 slaves, a seed of 77 (-s) for the rand function, 500
+    generations for each GA in a slave(-g), and show the best results obtained
+    by generation: 
+    $ mpirun -np 4 ./parallel_ga -s 77 -g 500 -m best_by_gen
+
+(2) The following command executes the parallel_ga by using 24 processes (-np)
+    one master and 23 slaves, a seed defined by time(NULL) for the rand()
+    function, 500 generations divided among the slaves processes (-t), a
+    population size of 500/23 = 22 for each slave, and show at the end of the
+    execution the number of reversals, number of evaluations of the fitness
+    function, and number of used generations (-m): 
+    $ mpirun -np 24 ./parallel_ga -t 500 -m final_result
+
+(3) The following command executes the parallel_ga by using 24 processes (-np)
+    one master and 23 slaves, a random seed of 77 (-s) for the rand function,
+    1000 generations for each GA in a slave (-g), 20000 evaluations of the
+    fitness function (-e) as stop condition, a population size of 13 (-p) for
+    each GA in a slave, and show at the end of the execution the number of
+    reversals, number of evaluations of the fitness function, and number of
+    used generations (-m):  
+    $ mpirun -np 24 ./parallel_ga -s 77 -g 1000 -e 20000 -p 13 -m final_result
+
+About the Files
+===============
+
+main.c              : This file contains the main function for executing the
+                      parallel genetic algorithm (Parallel-GA), with multiple
+                      populations.
+
+operadores.c        : This file contains the breeding operators such as
+                      crossover and mutation.
+
+calc_fitness.c      : This file contains a function that calls the 
+                      "invdist_circular_nomem" function for calculating the
+                      fitness of an individual.
+
+ordenar_pob.c       : This file contains the function for sorting the
+                      population by using the counting sort algorithm.
+
+structs_ga.h        : This file contains the structures used by the parallel
+                      genetic algorithm.
+
+invdist.c           : This file contains the linear time algorithm for
+                      computing the reversal distance for signed permutations.
+                      This file was taken from GRAPPA software.
+
+uf.c                : This file contains some functions used in "invdist.c"
+
+structs.h           : This file contains structures used in "invdist.c"
+
+References
+==========
+
+(1) Soncco-Alvarez, J. L., Almeida, G. M., Becker, J., & Ayala-Rincon, M.
+    (2013, August). Parallelization and virtualization of genetic algorithms
+    for sorting permutations by reversals. In Nature and Biologically Inspired
+    Computing (NaBIC), 2013 World Congress on (pp. 29-35). IEEE.
+
+(2) Soncco-Alvarez, J. L., Almeida, G. M., Becker, J., & Ayala-Rincon, M.
+    (2015). Parallelization of genetic algorithms for sorting permutations by
+    reversals over biological data. International Journal of Hybrid Intelligent
+    Systems, 12(1), 53-64.
+
+Bug Reporting
+=============
+
+If you find any problem in our programs please contact us to: 
+jose.soncco.alvarez@gmail.com
+
+-------------------------------------------------------------------------------
